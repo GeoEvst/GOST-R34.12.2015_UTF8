@@ -77,37 +77,8 @@ def x_s_conversion(k_1, c_n):
 
 
 key = '7766554433221100FFEEDDCCBBAA9988EFCDAB89674523011032547698BADCFE'
-key_r = '8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef'
 constants = generate_iter_consts()
 
 
-constants_reversed = []
-for i in range(32):
-    const_n = constants[i][1]
-    cn_r = ''
-    cnt_1 = 2
-    cnt_2 = 0
-    for j in range(16):
-        if j == 0:
-            cn_r += const_n[-2:]
-        else:
-            cn_r += const_n[-cnt_1:-cnt_2]
-        cnt_1 += 2
-        cnt_2 += 2
-    constants_reversed.append(cn_r)
 
 
-n = hex_to_int("0998ca37a7947aabb78f4a5ae81b748a")
-l_n = l_conv(n)
-print(int_to_hex(l_n))
-
-gal = []
-for i in range(16):
-    gal.append(multiply_in_galois_field(n[i], galois_row_r[i]))
-print(gal)
-
-x_g = 0
-for i in range(16):
-    x_g = x_g ^ gal[i]
-print(hex(x_g)[2:])
-print(constants[0])
