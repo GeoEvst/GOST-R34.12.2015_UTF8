@@ -1,6 +1,5 @@
 degrees_galois_field = [[0, 1], [1, 2]]
 galois_row = [1, 148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148]
-constant = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32]
 
 
 # Генерация таблицы степеней поля Галуа GF(256) / Generating a table of degrees of the Galois field GF(256)
@@ -87,4 +86,6 @@ def generate_iter_consts():
 
 galois_field = generate_table_galois()
 iterative_constants = generate_iter_consts()
-print(iterative_constants)
+# print(iterative_constants)
+
+
