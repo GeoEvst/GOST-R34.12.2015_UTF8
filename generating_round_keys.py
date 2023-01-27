@@ -1,9 +1,8 @@
 from iterative_constants import generate_iter_consts, generate_table_galois, multiply_in_galois_field
 
-galois_row = [1, 148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148]
-galois_row_r = [148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148, 1]
+galois_row = (1, 148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148)
 
-s_box = [252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 213, 35, 197, 4, 77,
+s_box = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 213, 35, 197, 4, 77,
          233, 119, 240, 219, 147, 46, 153, 186, 23, 54, 241, 187, 20, 205, 95, 193,
          249, 24, 101, 90, 226, 92, 239, 33, 129, 28, 60, 66, 139, 1, 142, 79,
          5, 132, 2, 174, 227, 106, 143, 160, 6, 11, 237, 152, 127, 212, 211, 31,
@@ -18,7 +17,8 @@ s_box = [252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 213, 35, 197, 4, 77
          7, 88, 179, 64, 134, 172, 29, 247, 48, 55, 107, 228, 136, 217, 231, 137,
          225, 27, 131, 73, 76, 63, 248, 254, 141, 83, 170, 144, 202, 216, 133, 97,
          32, 113, 103, 164, 45, 43, 9, 91, 203, 155, 37, 208, 190, 229, 108, 82,
-         89, 166, 116, 210, 230, 244, 180, 192, 209, 102, 175, 194, 57, 75, 99, 182]
+         89, 166, 116, 210, 230, 244, 180, 192, 209, 102, 175, 194, 57, 75, 99, 182)
+
 
 
 def hex_to_int(x):
@@ -43,26 +43,23 @@ def int_to_hex(bytes_list):
     return block_hex
 
 
-def block_to_xor(k_n, c_n):
+def block_to_xor(left_block, right_block):
     x_conv = []
     cnt = 2
     for i in range(16):
-        k1_int, c_int = int(k_n[2 * i:cnt], 16), int(c_n[2 * i:cnt], 16)
-        x_conv.append(k1_int ^ c_int)
+        left_block_int, right_block_int = int(left_block[2 * i:cnt], 16), int(right_block[2 * i:cnt], 16)
+        x_conv.append(left_block_int ^ right_block_int)
         cnt += 2
-    # print(int_to_hex(x_conv))
     return x_conv
 
 
 def l_conv(x):
-    print('x =', x)
     for i in range(16):
         xor_byte = 0
         for j in range(16):
-            byte = multiply_in_galois_field(x[i + j], galois_row_r[j])
+            byte = multiply_in_galois_field(x[i + j], galois_row[j])
             xor_byte = xor_byte ^ byte
         x.append(xor_byte)
-        print(x)
     return x[16:]
 
 
@@ -76,9 +73,27 @@ def x_s_conversion(k_1, c_n):
     return s_conversion
 
 
+round_keys = []
 key = '7766554433221100FFEEDDCCBBAA9988EFCDAB89674523011032547698BADCFE'
+# key = '04fd9f0ac4adeb1568eccfe9d853453d448cc78cef6a8d2243436915534831db'
+# key = '448cc78cef6a8d2243436915534831db04fd9f0ac4adeb1568eccfe9d853453d'
+
+round_keys.append(key)
 constants = generate_iter_consts()
 
+for i in range(16):
+    print(i + 1, 'Cn =', constants[i][1])
+    k1 = key[:32]
+    right = key[:32]
+    left = key[32:]
+    print("k1 =", right, "k2 =", left)
+    right = x_s_conversion(right, constants[i][1])
+    right = l_conv(right)
+    right = int_to_hex(right)
+    right = block_to_xor(right, left)
+    right = int_to_hex(right)
+    key = right + k1
 
-
-
+    # if i == 7:
+    #     key1 = k1 + right
+    #     print(key1)

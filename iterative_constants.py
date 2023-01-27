@@ -88,4 +88,3 @@ galois_field = generate_table_galois()
 iterative_constants = generate_iter_consts()
 # print(iterative_constants)
 
-
