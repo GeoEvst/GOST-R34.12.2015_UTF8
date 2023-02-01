@@ -71,16 +71,18 @@ def generate_iter_consts():
             shift += 1
 
         const_1 = constant[15:]
-        ans = ''
-        for i in range(len(const_1)):
-            x = hex(const_1[i])[2:]
-            if len(x) < 2:
-                ans = ans + '0' + x
-            else:
-                ans = ans + x
-        x_const.append('C' + str(_))
-        x_const.append(ans)
-        iterative_consts.append((x_const))
+        const_1.reverse()
+        # print(const_1)
+        # ans = ''
+        # for i in range(len(const_1)):
+        #     x = hex(const_1[i])[2:]
+        #     if len(x) < 2:
+        #         ans = ans + '0' + x
+        #     else:
+        #         ans = ans + x
+        # x_const.append('C' + str(_))
+        # x_const.append(ans)
+        iterative_consts.append(const_1)
     return iterative_consts
 
 

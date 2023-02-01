@@ -1,7 +1,10 @@
 from iterative_constants import generate_iter_consts, generate_table_galois, multiply_in_galois_field
 
+# Ряд Галуа
+
 galois_row = (1, 148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148)
-galois_row_r = (148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148, 1)
+
+# Таблица нелинейного преобразования Кузнечика (s-box)
 
 s_box = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 218, 35, 197, 4, 77,
          233, 119, 240, 219, 147, 46, 153, 186, 23, 54, 241, 187, 20, 205, 95, 193,
@@ -20,23 +23,13 @@ s_box = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 218, 35, 197, 4, 77
          32, 113, 103, 164, 45, 43, 9, 91, 203, 155, 37, 208, 190, 229, 108, 82,
          89, 166, 116, 210, 230, 244, 180, 192, 209, 102, 175, 194, 57, 75, 99, 182)
 
-c = ['6ea276726c487ab85d27bd10dd849401', 'dc87ece4d890f4b3ba4eb92079cbeb02', 'b2259a96b4d88e0be7690430a44f7f03',
-'7bcd1b0b73e32ba5b79cb140f2551504', '156f6d791fab511deabb0c502fd18105', 'a74af7efab73df160dd208608b9efe06',
-'c9e8819dc73ba5ae50f5b570561a6a07', 'f6593616e6055689adfba18027aa2a08', '98fb40648a4d2c31f0dc1c90fa2ebe09',
-'2adedaf23e95a23a17b518a05e61c10a', '447cac8052ddd8824a92a5b083e5550b', '8d942d1d95e67d2c1a6710c0d5ff3f0c',
-'e3365b6ff9ae07944740add0087bab0d', '5113c1f94d76899fa029a9e0ac34d40e', '3fb1b78b213ef327fd0e14f071b0400f',
-'2fb26c2c0f0aacd1993581c34e975410', '41101a5e6342d669c4123cd39313c011', 'f33580c8d79a5862237b38e3375cbf12',
-'9d97f6babbd222da7e5c85f3ead82b13', '547f77277ce987742ea93083bcc24114', '3add015510a1fdcc738e8d936146d515',
-'88f89bc3a47973c794e789a3c509aa16', 'e65aedb1c831097fc9c034b3188d3e17', 'd9eb5a3ae90ffa5834ce2043693d7e18',
-'b7492c48854780e069e99d53b4b9ea19', '056cb6de319f0eeb8e80996310f6951a', '6bcec0ac5dd77453d3a72473cd72011b',
-'a22641319aecd1fd835291039b686b1c', 'cc843743f6a4ab45de752c1346ecff1d', '7ea1add5427c254e391c2823e2a3801e',
-'1003dba72e345ff6643b95333f27141f', '5ea7d8581e149b61f16ac1459ceda820']
 
+# Преобразование из HEX в десятичное число
 
 def hex_to_int(x):
     cnt = 2
     block = []
-    for i in range(16):
+    for i in range(len(x)//2):
         x_1 = x[2 * i:cnt]
         cnt += 2
         x_i = int(x_1, 16)
@@ -44,9 +37,11 @@ def hex_to_int(x):
     return block
 
 
+# Преобразование из десятичного числа в HEX
+
 def int_to_hex(bytes_list):
     block_hex = ''
-    for i in range(16):
+    for i in range(len(bytes_list)):
         y = hex(bytes_list[i])[2:]
         if len(y) < 2:
             block_hex += '0' + y
@@ -55,15 +50,16 @@ def int_to_hex(bytes_list):
     return block_hex
 
 
+# Сложение блоков по модулю 2 (Побитовый XOR)
+
 def block_to_xor(left_block, right_block):
     x_conv = []
-    cnt = 2
     for i in range(16):
-        left_block_int, right_block_int = int(left_block[2 * i:cnt], 16), int(right_block[2 * i:cnt], 16)
-        x_conv.append(left_block_int ^ right_block_int)
-        cnt += 2
+        x_conv.append(left_block[i] ^ right_block[i])
     return x_conv
 
+
+# Линейное преобразование (L - преобразование)
 
 def l_conv(x):
     for i in range(16):
@@ -75,6 +71,8 @@ def l_conv(x):
     return x[16:]
 
 
+# Сложение по модулю 2 и нелинейное преобразование (X, S - преобразование)
+
 def x_s_conversion(k_1, c_n):
     x_conv = block_to_xor(k_1, c_n)
     s_conversion = []
@@ -85,22 +83,33 @@ def x_s_conversion(k_1, c_n):
     return s_conversion
 
 
-round_keys = []
-key = '8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef'
+# Функция формирования десяти раундовых ключей (X, S, L - преобразования на основе мастер ключа и итерационных констант)
+
+def gen_round_keys(key):
+    round_keys = []
+    key = hex_to_int(key)
+    round_keys.append(key[:16])
+    round_keys.append(key[16:])
+    constants = generate_iter_consts()
+
+    for i in range(32):
+        k = key[:16]
+        left = key[:16]
+        right = key[16:]
+        left = x_s_conversion(left, constants[i])
+        left.reverse()
+        left = l_conv(left)
+        left.reverse()
+        left = block_to_xor(left, right)
+        left.extend(k)
+        key = left
+        if (i + 1) % 8 == 0:
+            round_keys.append(key[:16])
+            round_keys.append(key[16:])
+    for i in range(10):
+        print(int_to_hex(round_keys[i]))
+    return round_keys
 
 
-round_keys.append(key)
-constants = generate_iter_consts()
-
-for i in range(1):
-    k = key[:32]
-    left = key[:32]
-    right = key[32:]
-    left = x_s_conversion(left, constants[0][1])
-    print(int_to_hex(left))
-
-
-
-
-
-
+round_key = gen_round_keys('8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef')
+print(round_key)

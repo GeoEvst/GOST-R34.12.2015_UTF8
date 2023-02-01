@@ -4,7 +4,6 @@ import textwrap
 
 print('Введи ключ 16 символов')
 
-
 def to_pack_data():
     text = text_to_hex(input())
     chip_box = textwrap.wrap(text, 32)
@@ -17,6 +16,7 @@ def to_pack_data():
     return chip_box
 
 
+print(to_pack_data())
 # Аналог встроенной функции wrap
 # def to_wrap(text):
 #     cnt = 0
