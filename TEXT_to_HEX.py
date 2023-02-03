@@ -22,3 +22,5 @@ def hex_to_text(chip):
     return text
 
 
+print(text_to_hex('barnaul'))
+#print(hex_to_text('0068007500670061007200640065006e'))

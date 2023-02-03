@@ -1,10 +1,13 @@
 from iterative_constants import generate_iter_consts, generate_table_galois, multiply_in_galois_field
+import time
+t0 = time.process_time()
 
 # Ряд Галуа
 
 galois_row = (1, 148, 32, 133, 16, 194, 192, 1, 251, 1, 192, 194, 16, 133, 32, 148)
 
 # Таблица нелинейного преобразования Кузнечика (s-box)
+# Прямого
 
 s_box = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 218, 35, 197, 4, 77,
          233, 119, 240, 219, 147, 46, 153, 186, 23, 54, 241, 187, 20, 205, 95, 193,
@@ -22,6 +25,22 @@ s_box = (252, 238, 221, 17, 207, 110, 49, 22, 251, 196, 250, 218, 35, 197, 4, 77
          225, 27, 131, 73, 76, 63, 248, 254, 141, 83, 170, 144, 202, 216, 133, 97,
          32, 113, 103, 164, 45, 43, 9, 91, 203, 155, 37, 208, 190, 229, 108, 82,
          89, 166, 116, 210, 230, 244, 180, 192, 209, 102, 175, 194, 57, 75, 99, 182)
+
+s_box_inv = (165, 45, 50, 143, 14, 48, 56, 192, 84, 230, 158, 57, 85, 126, 82, 145,
+             100, 3, 87, 90, 28, 96, 7, 24, 33, 114, 168, 209, 41, 198, 164, 63, 224,
+             39, 141, 12, 130, 234, 174, 180, 154, 99, 73, 229,66, 228, 21, 183, 200,
+             6, 112, 157, 65, 117, 25, 201, 170, 252, 77, 191, 42, 115, 132, 213, 195,
+             175, 43, 134, 167, 177, 178, 91, 70, 211, 159, 253, 212, 15, 156, 47, 155,
+             67, 239, 217, 121, 182, 83, 127, 193, 240, 35, 231, 37, 94, 181, 30, 162, 223,
+             166, 254, 172, 34, 249, 226, 74, 188, 53, 202, 238, 120, 5, 107, 81, 225, 89,
+             163, 242, 113, 86, 17, 106, 137, 148, 101, 140, 187, 119, 60, 123, 40, 171, 210,
+             49, 222, 196, 95, 204, 207, 118, 44, 184, 216, 46, 54, 219, 105, 179, 20, 149,190,
+             98, 161, 59, 22, 102, 233, 92, 108, 109, 173, 55, 97, 75, 185, 227, 186, 241, 160,
+             133, 131, 218, 71, 197, 176, 51, 250, 150, 111, 110, 194, 246, 80, 255, 93, 169, 142,
+             23, 27, 151, 125, 236, 88, 247, 31, 251, 124, 9, 13, 122, 103, 69, 135, 220, 232, 79,
+             29, 78, 4, 235, 248, 243, 62, 61, 189, 138, 136, 221, 205, 11, 19, 152, 2, 147, 128,
+             144, 208, 36, 52, 203, 237, 244, 206, 153, 16, 68, 64, 146, 58, 1, 38, 18, 26, 72,
+             104, 245, 129, 139, 199, 214, 32, 10, 8, 0, 76, 215, 116)
 
 
 # Преобразование из HEX в десятичное число
@@ -83,6 +102,15 @@ def x_s_conversion(k_1, c_n):
     return s_conversion
 
 
+def s_conversion_inv(k_1):
+    s_conversion = []
+    s_x_s = ''
+    for i in range(16):
+        s_conversion.append(s_box_inv[k_1[i]])
+        s_x_s += hex(s_box[k_1[i]])[2:]
+    return s_conversion
+
+
 # Функция формирования десяти раундовых ключей (X, S, L - преобразования на основе мастер ключа и итерационных констант)
 
 def gen_round_keys(key):
@@ -106,10 +134,45 @@ def gen_round_keys(key):
         if (i + 1) % 8 == 0:
             round_keys.append(key[:16])
             round_keys.append(key[16:])
-    for i in range(10):
-        print(int_to_hex(round_keys[i]))
     return round_keys
 
 
+# Функция шифрования
+def encrypt(text, key):
+    for i in range(10):
+        if i != 9:
+            x = x_s_conversion(text, key[i])
+            x.reverse()
+            x = l_conv(x)
+            x.reverse()
+            text = x
+        else:
+            text = block_to_xor(text, key[i])
+    return text
+
+
+# Функция расшифрования
+def decrypt(text, key):
+    for i in range(10):
+        if i != 9:
+            x = block_to_xor(text, key[9 - i])
+            s = l_conv(x)
+            s = s_conversion_inv(s)
+            text = s
+        else:
+            text = block_to_xor(key[9 - i], text)
+    return text
+
+
 round_key = gen_round_keys('8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef')
-print(round_key)
+open_text = '1122334455667700ffeeddccbbaa9988'
+open_text = hex_to_int(open_text)
+encrypted_block = encrypt(open_text, round_key)
+ans = decrypt(encrypted_block, round_key)
+
+print(int_to_hex(encrypted_block))
+print(int_to_hex(ans))
+
+t1 = time.process_time() - t0
+# CPU seconds elapsed (floating point)
+print("Time elapsed: ", t1 - t0)
