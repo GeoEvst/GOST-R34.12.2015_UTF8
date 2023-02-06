@@ -4,6 +4,8 @@ from private_key_generator import gen_gamma, generate_random_key
 import textwrap
 
 
+# Упаковка входных данных в список поблочно по 128 бит
+
 def to_pack_data(text):
     chip_box = textwrap.wrap(text, 32)
     i = len(chip_box)
@@ -14,6 +16,8 @@ def to_pack_data(text):
         chip_box[i - 1] = last_chip
     return chip_box
 
+
+# Шифрование в режиме гаммирования по ГОСТ-34.13-2015
 
 def gamma_mode_encrypt(data, round_keys, gamma):
     chip_data_block = ''
@@ -27,6 +31,8 @@ def gamma_mode_encrypt(data, round_keys, gamma):
         chip_data_block += chip_data
     return chip_data_block
 
+
+# Расшифрование в режиме гаммирования по ГОСТ-34.13-2015
 
 def gamma_mode_decrypt(chip, round_keys, gamma):
     open_text = ''
