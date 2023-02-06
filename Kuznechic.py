@@ -40,17 +40,6 @@ def gamma_mode_decrypt(chip, round_keys, gamma):
     return open_text
 
 
-# master_key = '8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef'
-# open_data = ['1122334455667700ffeeddccbbaa9988', '00112233445566778899aabbcceeff0a', '112233445566778899aabbcceeff0a00', '2233445566778899aabbcceeff0a0011']
-# # chip = to_pack_data('f195d8bec10ed1dbd57b5fa240bda1b885eee733f6a13e5df33ce4b33c45dee4a5eae88be6356ed3d5e877f13564a3a5cb91fab1f20cbab6d1c6d15820bdba73')
-# IV = '1234567890abcef0'
-# IV = IV + '0' * 16
-# chip = gamma_mode_encrypt(open_data, master_key, IV)
-# print(chip)
-# x = to_pack_data(chip)
-# open_d = gamma_mode_decrypt(x, master_key, IV)
-# print(open_d)
-
 # Аналог встроенной функции wrap
 # def to_wrap(text):
 #     cnt = 0
