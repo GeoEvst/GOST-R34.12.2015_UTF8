@@ -4,6 +4,7 @@ def text_to_hex(text):
     chip = ''
     for i in range(len(text)):
         text_hex = hex(ord(text[i]))
+        print(text_hex)
         text_hex = text_hex.replace('x', '')
         if text[i].isascii() is True or text[i].isalnum() is False:
             chip = chip + '0' + text_hex
@@ -22,5 +23,3 @@ def hex_to_text(chip):
     return text
 
 
-print(text_to_hex('barnaul'))
-#print(hex_to_text('0068007500670061007200640065006e'))

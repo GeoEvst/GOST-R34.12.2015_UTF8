@@ -1,6 +1,6 @@
 from iterative_constants import generate_iter_consts, generate_table_galois, multiply_in_galois_field
 import time
-t0 = time.process_time()
+# t0 = time.process_time()
 
 # Ряд Галуа
 
@@ -139,6 +139,7 @@ def gen_round_keys(key):
 
 # Функция шифрования
 def encrypt(text, key):
+    text = hex_to_int(text)
     for i in range(10):
         if i != 9:
             x = x_s_conversion(text, key[i])
@@ -153,6 +154,7 @@ def encrypt(text, key):
 
 # Функция расшифрования
 def decrypt(text, key):
+    text = hex_to_int(text)
     for i in range(10):
         if i != 9:
             x = block_to_xor(text, key[9 - i])
@@ -164,15 +166,15 @@ def decrypt(text, key):
     return text
 
 
-round_key = gen_round_keys('8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef')
-open_text = '1122334455667700ffeeddccbbaa9988'
-open_text = hex_to_int(open_text)
-encrypted_block = encrypt(open_text, round_key)
-ans = decrypt(encrypted_block, round_key)
+# round_key = gen_round_keys('8899aabbccddeeff0011223344556677fedcba98765432100123456789abcdef')
+# open_text = '1122334455667700ffeeddccbbaa9988'
+# open_text = hex_to_int(open_text)
+# encrypted_block = encrypt(open_text, round_key)
+# ans = decrypt(encrypted_block, round_key)
+#
+# print(int_to_hex(encrypted_block))
+# print(int_to_hex(ans))
 
-print(int_to_hex(encrypted_block))
-print(int_to_hex(ans))
-
-t1 = time.process_time() - t0
-# CPU seconds elapsed (floating point)
-print("Time elapsed: ", t1 - t0)
+# t1 = time.process_time() - t0
+# # CPU seconds elapsed (floating point)
+# print("Time elapsed: ", t1 - t0)
